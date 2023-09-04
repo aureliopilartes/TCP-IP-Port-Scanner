@@ -1,0 +1,30 @@
+import requests
+
+# Defina a URL do seu site local e o endpoint onde o formulário está localizado
+url = 'http://localhost:8000'
+csrf_demo_url = f'{url}/csrf_demo/'
+post_data_url = f'{url}/post_data/'
+
+# Faça uma solicitação GET para a página CSRF para obter o token CSRF
+response = requests.get(csrf_demo_url)
+csrf_token = response.cookies['csrftoken']
+
+# Crie os dados que você deseja enviar no corpo da solicitação POST
+data = {
+    'data': 'Data maliciosa',  # Personalize com os dados relevantes para o seu teste
+}
+
+# Defina o cabeçalho com o token CSRF
+headers = {
+    'Referer': csrf_demo_url,
+    'X-CSRFToken': csrf_token,
+}
+
+# Faça a solicitação POST com os dados e cabeçalho personalizados
+response = requests.post(post_data_url, data=data, headers=headers)
+
+# Verifique a resposta para determinar se o teste foi bem-sucedido
+if 'CSRF verification failed' in response.text:
+    print('Teste de CSRF bem-sucedido')
+else:
+    print('Teste de CSRF falhou')
